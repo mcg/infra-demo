@@ -1,0 +1,19 @@
+- name: Install packages
+  sudo: yes
+  apt: package={{ item }} state=present update_cache=yes
+  with_items:
+    - nagios3
+
+
+- name: Services enables/started
+  sudo: yes
+  service: name={{ item }} state=started enabled=yes
+  with_items:
+    - nagios3
+
+
+
+#- name: deploy iptables rules
+#  template: src=iptables-save dest=/etc/sysconfig/iptables
+#  notify: restart iptables
+

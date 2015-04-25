@@ -1,0 +1,13 @@
+---
+- name: Setup backends
+  template: src=backends.conf.j2 dest={{nginx_conf_dir}}/conf.d/{{ item }}-backend.conf
+  with_items: nginx_sites.keys()
+  notify:
+    - reload nginx
+  tags: [configuration,nginx]
+  
+      
+#- name: deploy iptables rules
+#  template: src=iptables-save dest=/etc/sysconfig/iptables
+#  notify: restart iptables
+

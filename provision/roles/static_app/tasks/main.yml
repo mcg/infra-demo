@@ -1,0 +1,3 @@
+---
+- name: Deploy dummy static content
+  template: src=index.html.j2 dest=/usr/share/nginx/html/index.html

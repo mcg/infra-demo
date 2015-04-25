@@ -1,0 +1,6 @@
+#{{ ansible_managed }}
+upstream {{ item }} {
+{% for server in groups['appservers'] -%}
+   server {{ hostvars[server].ansible_default_ipv4.address }}:8080 weight=10;   
+{% endfor %}
+}

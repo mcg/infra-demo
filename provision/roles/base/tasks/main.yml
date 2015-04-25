@@ -1,0 +1,23 @@
+- name: Remove cruft
+  sudo: yes
+  apt: package={{ item }} state=absent purge=yes
+  with_items:
+    - puppet
+    - chef
+    
+- name: Install packages
+  sudo: yes
+  apt: package={{ item }} state=present update_cache=yes
+  with_items:
+    - ssh
+    - ufw
+    - git
+
+- name: Services enables/started
+  sudo: yes
+  service: name={{ item }} state=started enabled=yes
+  with_items:
+    - ssh
+    - ufw
+
+
