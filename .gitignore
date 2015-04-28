@@ -1,2 +1,7 @@
 /terraform.tfvars
 /ansible.cfg
+/terraform.tfstate
+/terraform.tfstate.backup
+/provision/inventory.yml
+/terraform.tfstate
+/terraform.tfstate.backup
