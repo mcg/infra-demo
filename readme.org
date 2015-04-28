@@ -1,5 +1,6 @@
 * Installation
 - This assumes you have an existing EC2 key pair, and a SSH key pair installed on EC2
+- clone this repo
 - install terraform
 - install ansible(1.7.2)
 - gem install terraform_inventory (not the best tool, but it's quick)
@@ -13,3 +14,8 @@
 - Assuming the "terraform apply" was successful,  exec
   "tinventory --map=aws_instance.fe01:webservers aws_instance.app01:appservers aws_instance.app02:appservers  ./provision/inventory.yml"
   This will build a ansible usable inventory from the terraform state file.
+- Next configure hosts with
+  ```ansible-playbook  -i provision/inventory.yml provision/site.yml```
+
+* Cleanup
+  - "terraform destroy" should shutdown all hosts.

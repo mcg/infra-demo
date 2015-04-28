@@ -2,7 +2,12 @@
   sudo: true
   roles:
     - base
+    - role: iptables
+      iptables_enabled: yes
+      iptables_deny_all: yes
+      iptables_allowed_tcp_ports: [22]
 
+      
 - hosts: webservers
   sudo: true
   roles:
@@ -18,6 +23,19 @@
         proxy:
           - proxy_set_header X-Real-IP  $remote_addr
           - proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for
+    - role: iptables
+      iptables_allowed_tcp_ports: [22,80]
+      iptables_allowed_udp_ports: [5666]
+    - { role: nagios-nrpe-server,  
+    nagios_nrpe_server_apt_packages: [
+      nagios-nrpe-server,
+      nagios-plugins-extra
+      ],
+    nagios_nrpe_server_config: {
+      server_port: 5666,
+      allowed_hosts: "{{ hostvars[groups['monitoring'][0]]['ansible_default_ipv4']['address'] }}"
+      }
+    }
 
           
 - hosts: appservers
@@ -32,7 +50,25 @@
           - listen 8080
           - root /usr/share/nginx/html
     - static_app
-          
+    - role: iptables
+      iptables_allowed_tcp_ports: [22,8080]
+      iptables_allowed_udp_ports: [5666]
+
+      
 - hosts: monitoring
+  sudo: true
   roles:
     - monitoring
+    - role: iptables
+      iptables_allowed_tcp_ports: [22,80]
+    - role: nagios-config
+      nagios_hosts:
+        - webservers
+        - appservers
+      nagios_host_groups:
+        - name: "webservers"
+          alias: "Frontend"
+          checks:
+            - {command: 'check_nrpe2!check_disk_nrpe', description: 'Disk Space Left'}
+      nagios_commands:
+        - {name: 'check_nrpe2', command: '$USER1$/check_nrpe -H $HOSTADDRESS$ -c $ARG1$'}

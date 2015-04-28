@@ -89,3 +89,22 @@ resource "aws_instance" "app02" {
         ]
     }
 }
+
+resource "aws_instance" "monitoring01" {
+    ami = "ami-408c7f28"
+    instance_type = "t1.micro"
+    security_groups = ["default", "${aws_security_group.default.name}", "${aws_security_group.frontend.name}"]
+    key_name = "${var.key_name}"
+
+    connection {
+        user = "ubuntu"
+        type = "ssh"
+        key_file = "${var.private_key}"
+        timeout = "2m"
+    }
+    provisioner "remote-exec" {
+        inline = [
+            "sudo apt-get -y update",
+        ]
+    }
+}
