@@ -23,7 +23,7 @@
   inventory.yml, overwrite with a "y"
 - Next configure hosts with
 #+BEGIN_SRC bash
-  ansible-playbook  -i provision/inventory.yml provision/site.yml
+  ansible-playbook -i provision/inventory.yml provision/site.yml
 #+END_SRC
 
 ** Cleanup
