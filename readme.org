@@ -27,7 +27,7 @@
 #+END_SRC
 
 ** Cleanup
-  -#+BEGIN_SRC bash
+  - To shutdown all hosts.
+#+BEGIN_SRC bash
    terraform destroy
-   #+END_SRC
-   To shutdown all hosts.
+#+END_SRC
