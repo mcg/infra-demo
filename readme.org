@@ -16,11 +16,18 @@
 ** Execution
 - From the  harvest-terraform directory, execute "terraform apply". This should build the needed EC2 infra
 - Assuming the "terraform apply" was successful,  exec
-  ```tinventory --map=aws_instance.fe01:webservers aws_instance.app01:appservers aws_instance.app02:appservers aws_instance.monitoring01:monitoring  ./provision/inventory.yml```
+#+BEGIN_SRC bash
+  tinventory --map=aws_instance.fe01:webservers aws_instance.app01:appservers aws_instance.app02:appservers aws_instance.monitoring01:monitoring  ./provision/inventory.yml
+#+END_SRC
   This will build a ansible usable inventory from the terraform state file. If it complains of a existing/conflicting
   inventory.yml, overwrite with a "y"
 - Next configure hosts with
-  ```ansible-playbook  -i provision/inventory.yml provision/site.yml```
+#+BEGIN_SRC bash
+  ansible-playbook  -i provision/inventory.yml provision/site.yml
+#+END_SRC
 
 ** Cleanup
-  - ```terraform destroy``` should shutdown all hosts.
+  -#+BEGIN_SRC bash
+   terraform destroy
+   #+END_SRC
+   To shutdown all hosts.
