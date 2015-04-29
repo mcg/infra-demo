@@ -2,3 +2,8 @@
 - include: lb.yml
   when: nginx_lb == True
 
+- name: Install packages
+  sudo: yes
+  apt: package={{ item }} state=present update_cache=yes
+  with_items:
+    - python-httplib2

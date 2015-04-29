@@ -2,10 +2,19 @@
   sudo: true
   roles:
     - base
-    - role: iptables
-      iptables_enabled: yes
-      iptables_deny_all: yes
-      iptables_allowed_tcp_ports: [22]
+    - role: nagios-nrpe-server
+      nagios_nrpe_server_apt_packages: 
+        - nagios-nrpe-server
+        - nagios-plugins-extra
+      nagios_nrpe_server_config: {
+        server_port: 5666,
+        allowed_hosts: "{{ hostvars[groups['monitoring'][0]]['ansible_default_ipv4']['address'] }}",
+        dont_blame_nrpe: 1
+      }
+      nagios_nrpe_server_commands:
+        - name: check_disk
+          line: /usr/lib/nagios/plugins/check_disk -w $ARG1$ -c $ARG2$ -p $ARG3
+    
 
       
 - hosts: webservers
@@ -24,20 +33,9 @@
           - proxy_set_header X-Real-IP  $remote_addr
           - proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for
     - role: iptables
-      iptables_allowed_tcp_ports: [22,80]
-      iptables_allowed_udp_ports: [5666]
-    - { role: nagios-nrpe-server,  
-    nagios_nrpe_server_apt_packages: [
-      nagios-nrpe-server,
-      nagios-plugins-extra
-      ],
-    nagios_nrpe_server_config: {
-      server_port: 5666,
-      allowed_hosts: "{{ hostvars[groups['monitoring'][0]]['ansible_default_ipv4']['address'] }}"
-      }
-    }
+      iptables_allowed_tcp_ports: [22,80,5666]
 
-          
+      
 - hosts: appservers
   sudo: true
   roles:
@@ -51,8 +49,13 @@
           - root /usr/share/nginx/html
     - static_app
     - role: iptables
-      iptables_allowed_tcp_ports: [22,8080]
-      iptables_allowed_udp_ports: [5666]
+      iptables_allowed_tcp_ports: [22,8080,5666]
+
+  post_tasks:
+    - name: Confirm appservers are up and reachable from FE
+      action: uri url=http://{{ hostvars[groups['appservers'][0]]['ansible_default_ipv4']['address'] }}:8080/
+      delegate_to:  "{{ item }}"
+      with_items: groups.webservers
 
       
 - hosts: monitoring
@@ -69,6 +72,17 @@
         - name: "webservers"
           alias: "Frontend"
           checks:
-            - {command: 'check_nrpe2!check_disk_nrpe', description: 'Disk Space Left'}
+            - {command: 'check_nrpe3!check_disk!10%!5%!/', description: 'Disk Space /'}
+            - {command: 'check_nrpe1!check_load', description: 'Load'}
+            - {command: 'check_http', description: 'LB Nginx'}
+        - name: "appservers"
+          alias: "App Servers"
+          checks:
+            - {command: 'check_nrpe3!check_disk!10%!5%!/', description: 'Disk Space /'}
+            - {command: 'check_nrpe1!check_load', description: 'Load'}
+            - {command: 'check_http_port!8080', description: 'App Server Nginx'}
       nagios_commands:
-        - {name: 'check_nrpe2', command: '$USER1$/check_nrpe -H $HOSTADDRESS$ -c $ARG1$'}
+        - {name: 'check_nrpe1', command: '$USER1$/check_nrpe -H $HOSTADDRESS$ -c $ARG1$'}
+        - {name: 'check_nrpe3', command: '$USER1$/check_nrpe -H $HOSTADDRESS$ -c $ARG1$ -a $ARG2$ $ARG3$ $ARG4$'}
+        - {name: 'check_http_port', command: '$USER1$/check_http -H $HOSTADDRESS$ -I $HOSTADDRESS$ -p $ARG1$ $ARG2$'}
+        

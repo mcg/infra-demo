@@ -1,3 +1,14 @@
+# Nagios
+- name: create nagios.cfg
+  sudo: true
+  notify: restart nagios
+  template: >
+    src=nagios.cfg.j2
+    dest=/etc/nagios3/nagios.cfg
+    owner=nagios
+    group=www-data
+    mode=640
+
 # Hosts.
 - name: create hosts.cfg
   sudo: true

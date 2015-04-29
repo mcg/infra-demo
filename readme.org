@@ -1,21 +1,26 @@
-* Installation
-- This assumes you have an existing EC2 key pair, and a SSH key pair installed on EC2
+* Infra Demo
+
+** Installation
+- This assumes you have an existing EC2 key pair, a SSH key pair installed on EC2
+  and the "default" AWS security group allows inter-instance access.
 - clone this repo
 - install terraform
+  https://terraform.io/downloads.html
 - install ansible(1.7.2)
-- gem install terraform_inventory (not the best tool, but it's quick)
+- gem install terraform_inventory (not the best tool, but I need an inventory)
 - cp terraform-init.tfvars terraform.tfvars
 - edit terraform.tfvars to reflect your existing EC2 account, path to SSH key pair and key name
 - cp ansible-init.cfg ansible.cfg
 - edit ansible.cfg to point to your existing EC2 SSH private key
 
-* Execution
+** Execution
 - From the  harvest-terraform directory, execute "terraform apply". This should build the needed EC2 infra
 - Assuming the "terraform apply" was successful,  exec
-  "tinventory --map=aws_instance.fe01:webservers aws_instance.app01:appservers aws_instance.app02:appservers  ./provision/inventory.yml"
-  This will build a ansible usable inventory from the terraform state file.
+  ```tinventory --map=aws_instance.fe01:webservers aws_instance.app01:appservers aws_instance.app02:appservers aws_instance.monitoring01:monitoring  ./provision/inventory.yml```
+  This will build a ansible usable inventory from the terraform state file. If it complains of a existing/conflicting
+  inventory.yml, overwrite with a "y"
 - Next configure hosts with
   ```ansible-playbook  -i provision/inventory.yml provision/site.yml```
 
-* Cleanup
-  - "terraform destroy" should shutdown all hosts.
+** Cleanup
+  - ```terraform destroy``` should shutdown all hosts.

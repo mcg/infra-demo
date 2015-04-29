@@ -3,6 +3,8 @@
   apt: package={{ item }} state=present update_cache=yes
   with_items:
     - nagios3
+    - nagios-nrpe-plugin
+    - python-passlib
 
 
 - name: Services enables/started
@@ -10,6 +12,40 @@
   service: name={{ item }} state=started enabled=yes
   with_items:
     - nagios3
+
+#this is gross, but quick
+- name: Correct Nagios permissions for /var/lib/nagios3
+  sudo: yes
+  file: path=/var/lib/nagios3 mode=0755
+  notify: restart apache2
+
+- name: Correct Nagios permissions for /var/lib/nagios3/rw
+  sudo: yes
+  file: path=/var/lib/nagios3/rw mode=0755
+  notify: restart apache2
+
+- name: Make sure www-data is in the nagios group
+  sudo: yes
+  user: name=www-data groups=nagios append=yes
+  notify: restart apache2
+
+- name: add passwords for nagios
+  sudo: true
+  htpasswd: >
+    name="{{nagios_user}}"
+    password="{{nagios_password}}"
+    path=/etc/nagios3/htpasswd.users
+
+- name: set permissions on new password file
+  sudo: true
+  file: >
+    path=/etc/nagios3/htpasswd.users
+    owner=nagios
+    group=www-data
+    mode=640
+
+
+
 
 
 
