@@ -17,17 +17,17 @@
 - name: Correct Nagios permissions for /var/lib/nagios3
   sudo: yes
   file: path=/var/lib/nagios3 mode=0755
-  notify: restart apache2
+  notify: restart apache
 
 - name: Correct Nagios permissions for /var/lib/nagios3/rw
   sudo: yes
   file: path=/var/lib/nagios3/rw mode=0755
-  notify: restart apache2
+  notify: restart apache
 
 - name: Make sure www-data is in the nagios group
   sudo: yes
   user: name=www-data groups=nagios append=yes
-  notify: restart apache2
+  notify: restart apache
 
 - name: add passwords for nagios
   sudo: true
