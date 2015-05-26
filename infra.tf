@@ -9,7 +9,7 @@ provider "aws" {
     region = "us-east-1"
 }
 resource "aws_security_group" "default" {
-    name = "harvest default"
+    name = "h default"
     description = "Default group, ssh access"
 
     # SSH access from anywhere
@@ -22,7 +22,7 @@ resource "aws_security_group" "default" {
 }
 
 resource "aws_security_group" "frontend" {
-    name = "harvest frontend"
+    name = "h frontend"
     description = "Allow port 80 to fe"
 
     # HTTP access from anywhere

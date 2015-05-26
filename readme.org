@@ -14,7 +14,7 @@
 - edit ansible.cfg to point to your existing EC2 SSH private key
 
 ** Execution
-- From the  harvest-terraform directory, execute "terraform apply". This should build the needed EC2 infra
+- From the infra-demo directory, execute "terraform apply". This should build the needed EC2 infra
 - Assuming the "terraform apply" was successful,  exec
 #+BEGIN_SRC bash
   tinventory --map=aws_instance.fe01:webservers aws_instance.app01:appservers aws_instance.app02:appservers aws_instance.monitoring01:monitoring  ./provision/inventory.yml
